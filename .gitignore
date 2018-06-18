@@ -1,0 +1,60 @@
+# WPILib
+bin/
+build/
+dist/
+sysProps.xml
+workbench.xmi
+
+# IDE
+*.ipr
+*.iml
+*.iws
+out/
+tmp/
+.settings/
+.loadpath
+/.idea
+*.class
+.classpath
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# Toast/GradleRIO
+run/
+.gradle/
+gradle/.launch/
+
+# Extra
+hs_err_pid*
+junit/
+.mtj.tmp/
+*~
+
+# OSX
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.AppleDouble
+.LSOverride
+.Trashes
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+/bin/
+*.cab
+*.msi
+*.msm
+*.msp
