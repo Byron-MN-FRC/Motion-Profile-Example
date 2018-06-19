@@ -32,6 +32,8 @@ public class Robot extends IterativeRobot {
 	Joystick joy = new Joystick(0);
 	
 	boolean lastButton;
+	
+	MotionProfileExample _example = new MotionProfileExample(talon);
 
 	/**
 	 * This function is run when the robot is first started up and should be
