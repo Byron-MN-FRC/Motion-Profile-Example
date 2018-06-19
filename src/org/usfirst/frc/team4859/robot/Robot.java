@@ -7,7 +7,15 @@
 
 package org.usfirst.frc.team4859.robot;
 
+
+import com.ctre.phoenix.motion.SetValueMotionProfile;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -19,10 +27,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * project.
  */
 public class Robot extends IterativeRobot {
-	private static final String kDefaultAuto = "Default";
-	private static final String kCustomAuto = "My Auto";
-	private String m_autoSelected;
-	private SendableChooser<String> m_chooser = new SendableChooser<>();
+	TalonSRX talon = new TalonSRX(1);
+	TalonSRX follower = new TalonSRX(2);
+	Joystick joy = new Joystick(0);
+	
+	boolean lastButton;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -30,57 +39,61 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void robotInit() {
-		m_chooser.addDefault("Default Auto", kDefaultAuto);
-		m_chooser.addObject("My Auto", kCustomAuto);
-		SmartDashboard.putData("Auto choices", m_chooser);
+		talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+		talon.setSensorPhase(false); /* keep sensor and motor in phase */
+
+		talon.config_kF(0, 0.12, 10);
+		talon.config_kP(0, 0.24, 10);
+		talon.config_kI(0, 0.00005, 10);
+		talon.config_kD(0, 0.0, 10);
+
+		/* Our profile uses 10ms timing */
+		talon.configMotionProfileTrajectoryPeriod(10, 10); 
+		/*
+		 * status 10 provides the trajectory target for motion profile AND
+		 * motion magic
+		 */
+		talon.setStatusFramePeriod(StatusFrameEnhanced.Status_10_MotionMagic, 10, 10);
 	}
 
-	/**
-	 * This autonomous (along with the chooser code above) shows how to select
-	 * between different autonomous modes using the dashboard. The sendable
-	 * chooser code works with the Java SmartDashboard. If you prefer the
-	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-	 * getString line to get the auto name from the text box below the Gyro
-	 *
-	 * <p>You can add additional auto modes by adding additional comparisons to
-	 * the switch structure below with additional strings. If using the
-	 * SendableChooser make sure to add them to the chooser code above as well.
-	 */
-	@Override
-	public void autonomousInit() {
-		m_autoSelected = m_chooser.getSelected();
-		// autoSelected = SmartDashboard.getString("Auto Selector",
-		// defaultAuto);
-		System.out.println("Auto selected: " + m_autoSelected);
-	}
-
-	/**
-	 * This function is called periodically during autonomous.
-	 */
-	@Override
-	public void autonomousPeriodic() {
-		switch (m_autoSelected) {
-			case kCustomAuto:
-				// Put custom auto code here
-				break;
-			case kDefaultAuto:
-			default:
-				// Put default auto code here
-				break;
-		}
-	}
-
+	
+	
 	/**
 	 * This function is called periodically during operator control.
 	 */
 	@Override
 	public void teleopPeriodic() {
+		double leftYjoystick = -joy.getY();
+//		System.out.print("Joystick: " + leftYjoystick);
+//		System.out.println(" Sensor: " + _talon.getSelectedSensorPosition(0));
+//		
+//		System.out.println(_talon.getMotorOutputPercent());
+//		System.out.println(_follower.getMotorOutputPercent());
+		_example.control();
+		
+		if (joy.getRawButton(5)) {
+			SetValueMotionProfile setOutput = _example.getSetValue();
+
+			talon.set(ControlMode.MotionProfile, setOutput.value);
+			follower.set(ControlMode.Follower, 1);
+			if ((joy.getRawButton(5) == true) && (lastButton == false)) {
+				_example.startMotionProfile();
+			}
+			
+			
+		}
+		
+		lastButton = joy.getRawButton(5);
+	}
+	
+	public void disabledPeriodic() {
+		talon.set(ControlMode.PercentOutput, 0);
+		/* clear our buffer and put everything into a known state */
+		_example.reset();
 	}
 
 	/**
 	 * This function is called periodically during test mode.
 	 */
-	@Override
-	public void testPeriodic() {
-	}
+
 }
