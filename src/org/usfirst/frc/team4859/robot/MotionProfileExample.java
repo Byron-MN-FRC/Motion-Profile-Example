@@ -268,9 +268,10 @@ public class MotionProfileExample {
 		for (int i = 0; i < totalCnt; ++i) {
 			double positionRot = profile[i][0];
 			double velocityRPM = profile[i][1];
+//			System.out.println("Point #: " + i);
 			/* for each point, fill our structure and pass it to API */
-			point.position = positionRot * 4096; //Convert Revolutions to Units
-			point.velocity = velocityRPM * 4096 / 600.0; //Convert RPM to Units/100ms
+			point.position = (positionRot / (1 * Math.PI)) * 4096; //Convert Revolutions to Units
+			point.velocity = ((velocityRPM / (1 * Math.PI)) / 600) * 4096; //Convert RPM to Units/100ms
 			point.headingDeg = 0; /* future feature - not used in this example*/
 			point.profileSlotSelect0 = 0; /* which set of gains would you like to use [0,3]? */
 			point.profileSlotSelect1 = 0; /* future feature  - not used in this example - cascaded PID [0,1], leave zero */
@@ -280,8 +281,10 @@ public class MotionProfileExample {
 				point.zeroPos = true; /* set this to true on the first point */
 
 			point.isLastPoint = false;
-			if ((i + 1) == totalCnt)
+			if ((i + 1) == totalCnt) {
 				point.isLastPoint = true; /* set this to true on the last point  */
+//				System.out.println("LAST POINT");
+			}
 
 			_talon.pushMotionProfileTrajectory(point);
 		}

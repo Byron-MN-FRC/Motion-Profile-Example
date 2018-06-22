@@ -46,7 +46,7 @@ public class Robot extends IterativeRobot {
 
 		talon.config_kF(0, 0.12, 10);
 		talon.config_kP(0, 0.24, 10);
-		talon.config_kI(0, 0.00005, 10);
+		talon.config_kI(0, 0.0, 10);
 		talon.config_kD(0, 0.0, 10);
 
 		/* Our profile uses 10ms timing */
@@ -67,10 +67,16 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		double leftYjoystick = -joy.getY();
 //		System.out.print("Joystick: " + leftYjoystick);
-//		System.out.println(" Sensor: " + _talon.getSelectedSensorPosition(0));
+//		System.out.println(" Sensor: " + talon.getSelectedSensorPosition(0));
 //		
 //		System.out.println(_talon.getMotorOutputPercent());
 //		System.out.println(_follower.getMotorOutputPercent());
+		
+		System.out.println("Velocity: " + talon.getSelectedSensorVelocity(0) + " ");
+		System.out.print(talon.getActiveTrajectoryVelocity());
+		System.out.println();
+		
+		
 		_example.control();
 		
 		if (joy.getRawButton(5)) {
@@ -83,6 +89,10 @@ public class Robot extends IterativeRobot {
 			}
 			
 			
+		}
+		else {
+			talon.set(ControlMode.PercentOutput, leftYjoystick);
+			follower.set(ControlMode.Follower, 1);
 		}
 		
 		lastButton = joy.getRawButton(5);
